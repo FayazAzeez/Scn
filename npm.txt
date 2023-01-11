@@ -1,0 +1,69 @@
+app.use(session({
+  secret : 'webslesson',
+  resave : true,
+  saveUninitialized : true
+}));
+
+
+
+var session = require('express-session');
+
+
+router.get('/', function(req, res, next) {
+  res.render('login', { session : req.session });
+});
+
+router.post('/login', function(request, response, next){
+
+  var user_name = request.body.user_name;
+
+  var user_pass = request.body.user_pass;
+
+  if(user_name && user_pass)
+  {
+      query = `
+      SELECT * FROM loginuser 
+      WHERE user_name = "${user_name}"
+      `;
+
+      mysql.query(query, function(error, data){
+
+          if(data.length > 0)
+          {
+              for(var count = 0; count < data.length; count++)
+              {
+                  if(data[count].user_pass == user_pass)
+                  {
+                      request.session.user_id = data[count].user_id;
+
+                      response.redirect("/home");
+                  }
+                  else
+                  {
+                      response.send('Incorrect Password');
+                  }
+              }
+          }
+          else
+          {
+              response.send('Incorrect user name');
+          }
+          response.end();
+      });
+  }
+  else
+  {
+      response.send('Please Enter Email Address and Password Details');
+      response.end();
+  }
+
+});
+
+
+router.get('/logoout', function(request, response, next){
+
+  request.session.destroy();
+
+  response.redirect("/");
+
+});
