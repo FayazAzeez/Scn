@@ -1,0 +1,58 @@
+var express = require('express');
+var router = express.Router();
+    <section class="box">
+        <div class="design">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="form">
+            <h2>User Login</h2>
+            <form action="/" method="POST">
+                <input type="text" name="username" class="input-field" placeholder="Username" />
+                <input type="password" name="password" class="input-field" placeholder="Password" />
+                <input type="submit" class="btn" value="LOGIN">
+            </form>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+var mysql = require('../config/connection')
+const bodyParser = require("body-parser");
+const encoder = bodyParser.urlencoded();
+
+const app = express();
+app.use("/assets",express.static("assets"));
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+
+router.post("/",encoder, function(req,res){
+  var username = req.body.username;
+  var password = req.body.password;
+
+  mysql.query("select * from loginuser where user_name = ? and user_pass = ?",[username,password],function(error,results,fields){
+      if (results.length > 0) {
+          res.redirect("/welcome");
+      } else {
+          res.redirect("/");
+      }
+      res.end();
+  })
+})
+
+module.exports = router;
